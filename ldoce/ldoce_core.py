@@ -6,6 +6,7 @@ import urllib
 from urllib.request import urlopen
 import logging
 from aqt.utils import showInfo
+import ssl
 
 results = []
 dictionary = 'ldoce5'
@@ -17,7 +18,8 @@ def find_word_in_dictionary(word):
     global results
     url = baseurl + 'v2/dictionaries/' + dictionary + '/entries?headword=' + word
     request = urllib.request.Request(url, headers={"Accept": "application/json"})
-    content = json.load(urllib.request.urlopen(request))
+    context = ssl._create_unverified_context()
+    content = json.load(urllib.request.urlopen(request, context=context))
     results = []
     for result in content['results']:
         #if result['headword'] == word:
@@ -26,14 +28,6 @@ def find_word_in_dictionary(word):
     if len(results) == 0:
         showInfo("Word wasn't found in the LDOCE dictionary")
         return False
-    # try:
-    #     id = next(x['id'] for x in result if x['headword'] == word)
-    # except StopIteration as e:
-    #     #showInfo("Word wasn't found in the LDOCE dictionary")
-    #     return False
-    # # url = baseurl + 'v2/dictionaries/' + '/entries/' + id
-    # # request = urllib2.Request(url, headers={"Accept": "application/json"})
-    # # content = json.load(urllib2.urlopen(request))['result']
     return True
 
 
@@ -199,7 +193,8 @@ class Audio(object):
 
     def save(self):
         testfile = urllib.URLopener()
-        urllib.request.urlretrieve(self.file_url, self.file_name)
+        context = ssl._create_unverified_context()
+        urllib.request.urlretrieve(self.file_url, self.file_name, context)
 
 
 def debug():
